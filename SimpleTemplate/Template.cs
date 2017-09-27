@@ -54,8 +54,8 @@ namespace SimpleTemplate
         {
             this.CodeBuilder.AddLine("var result = new List<string>();");
 
-            var variablesCode = this.CodeBuilder.AddSection();
             var buffered = new List<string>();
+            var variablesSection = this.CodeBuilder.AddSection();
             var tokens = tokenPattern.Split(text);
 
             foreach (string token in tokens)
@@ -87,7 +87,8 @@ namespace SimpleTemplate
 
             foreach (string variableName in this.AllVariables)
             {
-                variablesCode.AddLine(string.Format("var c_{0} = {1};", variableName, this.ConvertToStringLiteral(this.Context[variableName].ToString())));
+                string variableValue = this.ConvertToStringLiteral(this.Context[variableName].ToString());
+                variablesSection.AddLine(string.Format("var c_{0} = {1};", variableName, variableValue));
             }
 
             this.CodeBuilder.AddLine("return string.Join(string.Empty, result);");

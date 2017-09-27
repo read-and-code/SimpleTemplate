@@ -7,7 +7,7 @@ namespace SimpleTemplate.Tests
     public class TemplateTest
     {
         [Fact]
-        public void Render()
+        public void RenderWithContext()
         {
             string text = @"<h1>{{ name }}</h1>";
             var context = new Dictionary<string, object>()
