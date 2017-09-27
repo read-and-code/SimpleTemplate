@@ -2,10 +2,10 @@
 
 # Install OpenCover and ReportGenerator, and save the path to their executables.
 nuget install -Verbosity quiet -OutputDirectory packages -Version 4.6.519 OpenCover
-nuget install -Verbosity quiet -OutputDirectory packages -Version 2.5.11 ReportGenerator
+nuget install -Verbosity quiet -OutputDirectory packages -Version 3.0.0 ReportGenerator
 
 OPENCOVER=$PWD/packages/OpenCover.4.6.519/tools/OpenCover.Console.exe
-REPORTGENERATOR=$PWD/packages/ReportGenerator.2.5.11/tools/ReportGenerator.exe
+REPORTGENERATOR=$PWD/packages/ReportGenerator.3.0.0/tools/ReportGenerator.exe
 
 coverage=./coverage
 mkdir $coverage
@@ -13,10 +13,10 @@ mkdir $coverage
 echo "Calculating coverage with OpenCover"
 $OPENCOVER \
   -target:"c:\Program Files\dotnet\dotnet.exe" \
-  -targetargs:"test ./Stone.Tests/Stone.Tests.csproj" \
+  -targetargs:"test ./SimpleTemplate.Tests/SimpleTemplate.Tests.csproj" \
   -output:$coverage/coverage.xml \
   -oldStyle \
-  -filter:"+[Stone*]* -[Stone.*Tests*]*" \
+  -filter:"+[SimpleTemplate*]* -[SimpleTemplate.*Tests*]*" \
   -register:user
 
 echo "Generating HTML report"
