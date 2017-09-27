@@ -2,6 +2,8 @@ image: Visual Studio 2017
 environment:
   PROJECT_FILE: ./SimpleTemplate/SimpleTemplate.csproj
   TEST_PROJECT_FILE: ./SimpleTemplate.Tests/SimpleTemplate.Tests.csproj
+  COVERALLS_REPO_TOKEN:
+    secure: 41T+UsqgAeBVUiAWxGQ240cVaC4U5M/KKZbrBJQlaNfIjtfixClwv4yX5SA3SP1Z
   CODECOV_REPO_TOKEN:
     secure: 1amhErB+ISmrlxsoCUI5QVGGZCfbJdqZ50ygV4Br6iP0QN15tjjv2utuSPxOYACk
 install:
