@@ -15,4 +15,5 @@ build_script:
 test_script:
   - cmd: dotnet test %TEST_PROJECT_FILE%
   - bash coverage.sh
+  - bash coveralls.sh
   - bash codecov.sh
