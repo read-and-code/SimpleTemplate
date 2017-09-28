@@ -54,6 +54,7 @@ namespace SimpleTemplate
         {
             this.CodeBuilder.AddLine("var result = new List<string>();");
 
+            var operationStack = new Stack<string>();
             var buffered = new List<string>();
             var variablesSection = this.CodeBuilder.AddSection();
             var tokens = tokenPattern.Split(text);
@@ -72,7 +73,46 @@ namespace SimpleTemplate
                 }
                 else if (token.StartsWith("{%"))
                 {
-                    continue;
+                    this.FlushOutput(buffered);
+
+                    var words = token.Substring(2, token.Length - 4).Trim().Split();
+
+                    if (words[0] == "if")
+                    {
+                        if (words.Length != 2)
+                        {
+                            this.SyntaxError(string.Format("Don't understand if, token: {0}", token));
+                        }
+
+                        operationStack.Push("if");
+
+                        this.CodeBuilder.AddLine(string.Format("if ({0}) {{", this.EvaluateExpression(words[1])));
+                        this.CodeBuilder.Indent();
+                    }
+                    else if (words[0].StartsWith("end"))
+                    {
+                        if (words.Length != 1)
+                        {
+                            this.SyntaxError(string.Format("Don't understand end, token: {0}", token));
+                        }
+
+                        var endWhat = words[0].Substring(3);
+
+                        if (operationStack.Count == 0)
+                        {
+                            this.SyntaxError(string.Format("Too many ends, token: {0}", token));
+                        }
+
+                        var startWhat = operationStack.Pop();
+
+                        if (startWhat != endWhat)
+                        {
+                            this.SyntaxError(string.Format("Mismatched end tag, token: {0}", token));
+                        }
+
+                        this.CodeBuilder.AddLine("}");
+                        this.CodeBuilder.Dedent();
+                    }
                 }
                 else
                 {
@@ -111,9 +151,20 @@ namespace SimpleTemplate
 
         private string EvaluateExpression(string expression)
         {
-            this.AddVariable(expression, this.AllVariables);
+            if (expression.Contains("."))
+            {
+                var variable = expression.Substring(0, expression.IndexOf("."));
 
-            return string.Format("c_{0}", expression);
+                this.AddVariable(variable, this.AllVariables);
+
+                return "c_" + expression;
+            }
+            else
+            {
+                this.AddVariable(expression, this.AllVariables);
+
+                return string.Format("c_{0}", expression);
+            }
         }
 
         private void FlushOutput(List<string> buffered)
