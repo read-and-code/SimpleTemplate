@@ -22,5 +22,11 @@ namespace SimpleTemplate
             get;
             set;
         }
+
+        public Func<object, IEnumerable<object>> ConvertToEnumerable
+        {
+            get;
+            set;
+        }
     }
 }

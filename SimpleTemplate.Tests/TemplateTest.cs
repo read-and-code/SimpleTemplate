@@ -37,6 +37,21 @@ namespace SimpleTemplate.Tests
             Assert.Equal("<h1>Hello</h1>", result);
         }
 
+        [Fact]
+        public void RenderWithFor()
+        {
+            var context = new Dictionary<string, object>()
+            {
+                { "numbers", new[] { 1, 2, 3 } },
+            };
+            string text = @"<ol>{% for number in numbers %}<li>{{ number }}</li>{% endfor %}</ol>";
+            Template template = new Template(text, context);
+
+            string result = template.Render();
+
+            Assert.Equal("<ol><li>1</li><li>2</li><li>3</li></ol>", result);
+        }
+
         public class User
         {
             public bool IsChild

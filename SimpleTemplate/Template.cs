@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -47,7 +48,7 @@ namespace SimpleTemplate
         {
             var code = this.CodeBuilder.ToString();
             var scriptOptions = ScriptOptions.Default.WithImports("System", "System.Collections.Generic");
-            var script = CSharpScript.RunAsync(code, scriptOptions, new Globals { Context = this.Context, ResolveDots = this.ResolveDots, IsTrue = this.IsTrue });
+            var script = CSharpScript.RunAsync(code, scriptOptions, new Globals { Context = this.Context, ResolveDots = this.ResolveDots, IsTrue = this.IsTrue, ConvertToEnumerable = this.ConvertToEnumerable });
 
             return script.Result.ReturnValue.ToString();
         }
@@ -91,6 +92,20 @@ namespace SimpleTemplate
                         this.CodeBuilder.AddLine(string.Format("if (IsTrue({0})) {{", this.EvaluateExpression(words[1])));
                         this.CodeBuilder.Indent();
                     }
+                    else if (words[0] == "for")
+                    {
+                        if (words.Length != 4 || words[2] != "in")
+                        {
+                            this.SyntaxError(string.Format("Don't understand for, token: {0}", token));
+                        }
+
+                        operationStack.Push("for");
+
+                        this.AddVariable(words[1], this.LoopVariables);
+
+                        this.CodeBuilder.AddLine(string.Format("foreach (var {0} in ConvertToEnumerable({1})) {{", words[1], this.EvaluateExpression(words[3])));
+                        this.CodeBuilder.Indent();
+                    }
                     else if (words[0].StartsWith("end"))
                     {
                         if (words.Length != 1)
@@ -127,7 +142,7 @@ namespace SimpleTemplate
 
             this.FlushOutput(buffered);
 
-            foreach (string variableName in this.AllVariables)
+            foreach (string variableName in new HashSet<string>(this.AllVariables.Except(this.LoopVariables)))
             {
                 variablesSection.AddLine(string.Format("var {0} = Context[{1}];", variableName, this.ConvertToStringLiteral(variableName)));
             }
@@ -215,6 +230,11 @@ namespace SimpleTemplate
                 default:
                     throw new TemplateRuntimeException(string.Format("Unsupported type to test truth, type: {0}", type.Name));
             }
+        }
+
+        private IEnumerable<object> ConvertToEnumerable(object value)
+        {
+            return ((Array)value).Cast<object>();
         }
     }
 }
