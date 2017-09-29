@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
@@ -45,7 +47,7 @@ namespace SimpleTemplate
         {
             var code = this.CodeBuilder.ToString();
             var scriptOptions = ScriptOptions.Default.WithImports("System", "System.Collections.Generic");
-            var script = CSharpScript.RunAsync(code, scriptOptions);
+            var script = CSharpScript.RunAsync(code, scriptOptions, new Globals { Context = this.Context, ResolveDots = this.ResolveDots, IsTrue = this.IsTrue });
 
             return script.Result.ReturnValue.ToString();
         }
@@ -86,7 +88,7 @@ namespace SimpleTemplate
 
                         operationStack.Push("if");
 
-                        this.CodeBuilder.AddLine(string.Format("if ({0}) {{", this.EvaluateExpression(words[1])));
+                        this.CodeBuilder.AddLine(string.Format("if (IsTrue({0})) {{", this.EvaluateExpression(words[1])));
                         this.CodeBuilder.Indent();
                     }
                     else if (words[0].StartsWith("end"))
@@ -127,8 +129,7 @@ namespace SimpleTemplate
 
             foreach (string variableName in this.AllVariables)
             {
-                string variableValue = this.ConvertToStringLiteral(this.Context[variableName].ToString());
-                variablesSection.AddLine(string.Format("var c_{0} = {1};", variableName, variableValue));
+                variablesSection.AddLine(string.Format("var c_{0} = Context[{1}];", variableName, this.ConvertToStringLiteral(variableName)));
             }
 
             this.CodeBuilder.AddLine("return string.Join(string.Empty, result);");
@@ -153,11 +154,11 @@ namespace SimpleTemplate
         {
             if (expression.Contains("."))
             {
-                var variable = expression.Substring(0, expression.IndexOf("."));
+                var dots = expression.Split('.');
+                var code = this.EvaluateExpression(dots[0]);
+                var arguments = dots.ToList().GetRange(1, dots.Length - 1).Select(x => this.ConvertToStringLiteral(x)).ToArray();
 
-                this.AddVariable(variable, this.AllVariables);
-
-                return "c_" + expression;
+                return string.Format("ResolveDots({0}, {1})", code, string.Format("new [] {{ {0} }}", string.Join(", ", arguments)));
             }
             else
             {
@@ -189,6 +190,31 @@ namespace SimpleTemplate
             }
 
             return "\"" + value.Replace("\"", "\\\"") + "\"";
+        }
+
+        private object ResolveDots(object value, string[] arguments)
+        {
+            foreach (string argument in arguments)
+            {
+                var property = value.GetType().GetProperty(argument);
+
+                value = property.GetValue(value);
+            }
+
+            return value;
+        }
+
+        private bool IsTrue(object value)
+        {
+            var type = value.GetType();
+
+            switch (type.Name)
+            {
+                case "Boolean":
+                    return (bool)value;
+                default:
+                    throw new TemplateRuntimeException(string.Format("Unsupported type to test truth, type: {0}", type.Name));
+            }
         }
     }
 }

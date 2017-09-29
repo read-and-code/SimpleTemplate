@@ -1,5 +1,10 @@
-PROJECT_FILE = ./SimpleTemplate/SimpleTemplate.csproj
-TEST_PROJECT_FILE = ./SimpleTemplate.Tests/SimpleTemplate.Tests.csproj
+PROJECT_NAME = SimpleTemplate
+PROJECT_FILE = ./$(PROJECT_NAME)/$(PROJECT_NAME).csproj
+TEST_PROJECT_FILE = ./$(PROJECT_NAME).Tests/$(PROJECT_NAME).Tests.csproj
+
+clean:
+	rm -rf ./$(PROJECT_NAME)/bin ./$(PROJECT_NAME)/obj
+	rm -rf ./$(PROJECT_NAME).Tests/bin ./$(PROJECT_NAME).Tests/obj
 
 restore:
 	dotnet restore $(PROJECT_FILE)
