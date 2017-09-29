@@ -129,7 +129,7 @@ namespace SimpleTemplate
 
             foreach (string variableName in this.AllVariables)
             {
-                variablesSection.AddLine(string.Format("var c_{0} = Context[{1}];", variableName, this.ConvertToStringLiteral(variableName)));
+                variablesSection.AddLine(string.Format("var {0} = Context[{1}];", variableName, this.ConvertToStringLiteral(variableName)));
             }
 
             this.CodeBuilder.AddLine("return string.Join(string.Empty, result);");
@@ -164,7 +164,7 @@ namespace SimpleTemplate
             {
                 this.AddVariable(expression, this.AllVariables);
 
-                return string.Format("c_{0}", expression);
+                return expression;
             }
         }
 
