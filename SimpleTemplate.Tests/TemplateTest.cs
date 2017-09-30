@@ -22,6 +22,21 @@ namespace SimpleTemplate.Tests
         }
 
         [Fact]
+        public void RenderWithComment()
+        {
+            string text = @"{# This is comment #}<h1>{{ name }}</h1>";
+            var context = new Dictionary<string, object>()
+            {
+                { "name", "Tom" },
+            };
+            Template template = new Template(text, context);
+
+            string result = template.Render();
+
+            Assert.Equal("<h1>Tom</h1>", result);
+        }
+
+        [Fact]
         public void RenderWithIf()
         {
             var user = new User { IsChild = true };
