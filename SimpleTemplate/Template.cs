@@ -48,7 +48,7 @@ namespace SimpleTemplate
         {
             var code = this.CodeBuilder.ToString();
             var scriptOptions = ScriptOptions.Default.WithImports("System", "System.Collections.Generic");
-            var script = CSharpScript.RunAsync(code, scriptOptions, new Globals { Context = this.Context, ResolveDots = this.ResolveDots, IsTrue = this.IsTrue, ConvertToEnumerable = this.ConvertToEnumerable });
+            var script = CSharpScript.RunAsync(code, scriptOptions, new Globals { Context = this.Context, ResolveDots = this.ResolveDots, IsTrue = this.IsTrue, ConvertToEnumerable = this.ConvertToEnumerable, FormatPrice = this.FormatPrice });
 
             return script.Result.ReturnValue.ToString();
         }
@@ -167,7 +167,19 @@ namespace SimpleTemplate
 
         private string EvaluateExpression(string expression)
         {
-            if (expression.Contains("."))
+            if (expression.Contains("|"))
+            {
+                var pipes = expression.Split('|');
+                var code = this.EvaluateExpression(pipes[0]);
+
+                foreach (var function in pipes.ToList().GetRange(1, pipes.Length - 1))
+                {
+                    code = string.Format("{0}({1})", function, code);
+                }
+
+                return code;
+            }
+            else if (expression.Contains("."))
             {
                 var dots = expression.Split('.');
                 var code = this.EvaluateExpression(dots[0]);
@@ -254,6 +266,11 @@ namespace SimpleTemplate
         private IEnumerable<object> ConvertToEnumerable(object value)
         {
             return ((Array)value).Cast<object>();
+        }
+
+        private string FormatPrice(object price)
+        {
+            return string.Format("${0}", price);
         }
     }
 }

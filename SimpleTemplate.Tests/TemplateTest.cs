@@ -83,6 +83,21 @@ namespace SimpleTemplate.Tests
             Assert.Equal("<h1>Hello, TOM</h1>", result);
         }
 
+        [Fact]
+        public void RenderWithPipe()
+        {
+            var context = new Dictionary<string, object>()
+            {
+                { "price", 100 },
+            };
+            string text = @"<h1>Price: {{ price|FormatPrice }}</h1>";
+            Template template = new Template(text, context);
+
+            string result = template.Render();
+
+            Assert.Equal("<h1>Price: $100</h1>", result);
+        }
+
         public class User
         {
             public string Name

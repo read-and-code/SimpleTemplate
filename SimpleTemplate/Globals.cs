@@ -28,5 +28,11 @@ namespace SimpleTemplate
             get;
             set;
         }
+
+        public Func<object, string> FormatPrice
+        {
+            get;
+            set;
+        }
     }
 }
