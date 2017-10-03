@@ -4,9 +4,6 @@ environment:
   TEST_PROJECT_FILE: ./SimpleTemplate.Tests/SimpleTemplate.Tests.csproj
   CODECOV_REPO_TOKEN:
     secure: 1amhErB+ISmrlxsoCUI5QVGGZCfbJdqZ50ygV4Br6iP0QN15tjjv2utuSPxOYACk
-install:
-  - cmd: dotnet restore %PROJECT_FILE%
-  - cmd: dotnet restore %TEST_PROJECT_FILE%
 build_script:
   - cmd: dotnet build %PROJECT_FILE%
   - cmd: dotnet build %TEST_PROJECT_FILE%
