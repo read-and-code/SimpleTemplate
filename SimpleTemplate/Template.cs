@@ -211,9 +211,28 @@ namespace SimpleTemplate
         {
             foreach (string argument in arguments)
             {
-                var property = value.GetType().GetProperty(argument);
+                var members = value.GetType().GetMember(argument);
 
-                value = property.GetValue(value);
+                // Suppose there is only one member
+                var member = members[0];
+
+                switch (member.MemberType)
+                {
+                    case MemberTypes.Property:
+                        value = ((PropertyInfo)member).GetValue(value);
+
+                        break;
+                    case MemberTypes.Field:
+                        value = ((FieldInfo)member).GetValue(value);
+
+                        break;
+                    case MemberTypes.Method:
+                        value = ((MethodInfo)member).Invoke(value, null);
+
+                        break;
+                    default:
+                        throw new TemplateRuntimeException(string.Format("Unsupported member type {0}", member.MemberType));
+                }
             }
 
             return value;

@@ -67,8 +67,30 @@ namespace SimpleTemplate.Tests
             Assert.Equal("<ol><li>1</li><li>2</li><li>3</li></ol>", result);
         }
 
+        [Fact]
+        public void RenderWithMethod()
+        {
+            var user = new User { Name = "Tom" };
+            var context = new Dictionary<string, object>()
+            {
+                { "user", user },
+            };
+            string text = @"<h1>Hello, {{ user.Name.ToUpper }}</h1>";
+            Template template = new Template(text, context);
+
+            string result = template.Render();
+
+            Assert.Equal("<h1>Hello, TOM</h1>", result);
+        }
+
         public class User
         {
+            public string Name
+            {
+                get;
+                set;
+            }
+
             public bool IsChild
             {
                 get;
