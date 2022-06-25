@@ -1,3 +1,3 @@
-[![CircleCI](https://circleci.com/gh/read-and-code/SimpleTemplate.svg?style=shield)](https://circleci.com/gh/read-and-code/SimpleTemplate) [![Build status](https://ci.appveyor.com/api/projects/status/ocv9h3ej8x6gp0x2/branch/master?svg=true)](https://ci.appveyor.com/project/Frederick-S/simpletemplate-is3i4/branch/master) [![codecov](https://codecov.io/gh/read-and-code/SimpleTemplate/branch/master/graph/badge.svg)](https://codecov.io/gh/read-and-code/SimpleTemplate)
+# SimpleTemplate [![Build](https://github.com/read-and-code/SimpleTemplate/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/read-and-code/SimpleTemplate/actions/workflows/build.yml)
 
 A toy implementation of [template engine](https://github.com/aosabook/500lines/blob/master/template-engine/template-engine.markdown) by .NET core.
